@@ -161,6 +161,11 @@ def edit_profile_view(request):
         request.user.last_name = last_name
         request.user.phone = phone
         request.user.whatsapp = whatsapp
+
+        avatar = request.FILES.get('avatar')
+        if avatar:
+            request.user.avatar = avatar
+
         request.user.save()
 
         if profile:

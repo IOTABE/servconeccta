@@ -39,7 +39,7 @@
             </div>
             {% endif %}
 
-            <form method="post" class="space-y-6">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
 
                 <div class="grid grid-cols-2 gap-4">
@@ -122,4 +122,22 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('avatarInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const container = document.querySelector('.relative .w-24.h-24');
+            if (container.querySelector('img')) {
+                container.querySelector('img').src = e.target.result;
+            } else {
+                container.innerHTML = '<img src="' + e.target.result + '" alt="Foto de perfil" class="w-full h-full object-cover">';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 {% endblock %}
