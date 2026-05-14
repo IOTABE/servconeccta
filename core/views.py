@@ -134,7 +134,7 @@ def custom_service_view(request):
         return redirect('core:login')
 
     if request.method == 'POST':
-        from services.models import CustomServiceRequest
+        from services.models import ServiceRequest
 
         service_type = request.POST.get('type', '')
         service_name = request.POST.get('service_name', '').strip()
@@ -155,18 +155,14 @@ def custom_service_view(request):
         if errors:
             return render(request, 'core/custom_service.html', {'errors': errors})
 
-        CustomServiceRequest.objects.create(
-            user=request.user,
-            type=service_type,
-            service_name=service_name,
-            description=description,
-            category_name=category_name,
+        ServiceRequest.objects.create(
+            client=request.user,
+            title=service_name,
+            description=f"{description}\n\nCategoria: {category_name or 'Não especificada'}\nOrçamento: {budget or 'Não informado'}",
             city=city,
             state=state,
-            phone=request.user.phone or '',
-            whatsapp=request.user.whatsapp or '',
-            budget=budget,
-            status='active'
+            is_custom=True,
+            status='pending'
         )
 
         return render(request, 'core/custom_service.html', {

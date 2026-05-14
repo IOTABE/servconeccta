@@ -58,7 +58,14 @@ class ServiceRequest(models.Model):
     category = models.ForeignKey(
         ServiceCategory,
         on_delete=models.PROTECT,
-        related_name='requests'
+        related_name='requests',
+        null=True,
+        blank=True
+    )
+
+    is_custom = models.BooleanField(
+        default=False,
+        help_text="Indica se é uma solicitação fora do catálogo"
     )
 
     title = models.CharField(max_length=200)
@@ -176,64 +183,3 @@ class ProfessionalService(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.professional.user.get_full_name()}"
-
-
-class CustomServiceRequest(models.Model):
-    """Solicitação ou oferta de serviço personalizado (fora do catálogo)"""
-
-    TYPE_CHOICES = [
-        ('request', 'Quero Contratar'),
-        ('offer', 'Quero Oferecer'),
-    ]
-
-    STATUS_CHOICES = [
-        ('pending', 'Pendente'),
-        ('active', 'Ativo'),
-        ('contacted', 'Contatado'),
-        ('closed', 'Encerrado'),
-    ]
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='custom_service_requests'
-    )
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES, db_index=True)
-
-    service_name = models.CharField(max_length=200, help_text="Nome do serviço que você busca ou oferece")
-    description = models.TextField(help_text="Descreva o serviço em detalhes")
-
-    category_name = models.CharField(
-        max_length=100,
-        blank=True,
-        help_text="Categoria近似 (ex: Limpeza, Reforma, Aulas) - opcional"
-    )
-
-    city = models.CharField(max_length=100, blank=True, db_index=True)
-    state = models.CharField(max_length=2, blank=True, db_index=True)
-    phone = models.CharField(max_length=20, blank=True)
-    whatsapp = models.CharField(max_length=20, blank=True)
-
-    budget = models.CharField(max_length=100, blank=True, help_text="Orçamento estimado (opcional)")
-
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        db_index=True
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'custom_service_requests'
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['type', 'status']),
-            models.Index(fields=['city', 'state']),
-            models.Index(fields=['user', 'created_at']),
-        ]
-
-    def __str__(self):
-        return f"{self.get_type_display()}: {self.service_name}"
