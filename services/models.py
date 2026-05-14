@@ -68,6 +68,16 @@ class ServiceRequest(models.Model):
         help_text="Indica se é uma solicitação fora do catálogo"
     )
 
+    service_type = models.CharField(
+        max_length=20,
+        blank=True,
+        choices=[
+            ('request', 'Quero Contratar'),
+            ('offer', 'Quero Oferecer'),
+        ],
+        help_text="Tipo de serviço personalizado: solicitação ou oferta"
+    )
+
     title = models.CharField(max_length=200)
     description = models.TextField()
     latitude = models.DecimalField(

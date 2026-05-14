@@ -10,4 +10,5 @@ urlpatterns = [
     path('cadastro/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('servico-personalizado/', views.custom_service_view, name='custom_service'),
+    path('editar-perfil/', views.edit_profile_view, name='edit_profile'),
 ]

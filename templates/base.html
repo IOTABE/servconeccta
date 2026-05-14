@@ -103,7 +103,10 @@
 <!-- Desktop Actions -->
                 <div class="hidden md:flex items-center space-x-3">
                     {% if user.is_authenticated %}
-                        <span class="text-gray-600 text-sm">Olá, {{ user.first_name|default:user.email }}</span>
+                        <a href="{% url 'core:edit_profile' %}" class="text-gray-600 text-sm hover:text-primary flex items-center gap-1">
+                            <span>Olá, {{ user.first_name|default:user.email }}</span>
+                            <i class="fa-solid fa-pen text-xs"></i>
+                        </a>
                         <a href="{% url 'core:logout' %}" class="text-gray-600 hover:text-primary px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-blue-50">Sair</a>
                     {% else %}
                         <a href="{% url 'core:login' %}" class="text-primary font-medium hover:text-primary/80 transition-colors text-sm">Entrar</a>
@@ -142,6 +145,9 @@
                     <hr class="my-2 border-gray-100">
                     {% if user.is_authenticated %}
                         <div class="px-4 py-2 text-gray-500 text-sm">Olá, {{ user.first_name|default:user.email }}</div>
+                        <a href="{% url 'core:edit_profile' %}" class="block px-4 py-3 text-gray-700 hover:text-primary hover:bg-blue-50 rounded-xl transition-colors font-medium">
+                            <i class="fa-solid fa-pen w-6 text-primary"></i> Editar Perfil
+                        </a>
                         <a href="{% url 'core:logout' %}" class="block px-4 py-3 text-gray-700 hover:text-primary hover:bg-blue-50 rounded-xl transition-colors font-medium">
                             <i class="fa-solid fa-right-from-bracket w-6 text-red-500"></i> Sair
                         </a>

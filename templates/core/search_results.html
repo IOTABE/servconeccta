@@ -52,7 +52,7 @@
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {% for cat in categories %}
-                    <a href="{% url 'core:search' %}?q={{ cat.name|urlencode }}"
+                    <a href="{% url 'core:search' %}?category={{ cat.slug }}"
                        class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-md transition-all hover:-translate-y-0.5">
                         <div class="w-12 h-12 rounded-full bg-blue-50 text-primary flex items-center justify-center text-lg mb-2 group-hover:bg-primary group-hover:text-white transition-all">
                             {% if cat.icon %}
@@ -63,6 +63,50 @@
                         </div>
                         <h3 class="font-medium text-gray-800 text-sm">{{ cat.name }}</h3>
                     </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Custom Requests Found -->
+            {% if custom_requests %}
+            <div class="mb-10">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-handshake-angle text-secondary"></i>
+                    Solicitações e Ofertas
+                    <span class="text-sm font-normal text-gray-400">({{ custom_requests|length }})</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for req in custom_requests %}
+                    <div class="bg-white rounded-2xl shadow-sm border {% if req.service_type == 'offer' %}border-green-200{% else %}border-secondary/20{% endif %} overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-3">
+                                {% if req.service_type == 'offer' %}
+                                <span class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                                    <i class="fa-solid fa-briefcase"></i> Oferta
+                                </span>
+                                {% else %}
+                                <span class="bg-secondary/10 text-secondary text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                                    <i class="fa-solid fa-search"></i> Solicitação
+                                </span>
+                                {% endif %}
+                                <span class="text-gray-400 text-xs">{{ req.created_at|date:"d/m" }}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ req.title }}</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ req.description }}</p>
+                            <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                                <span><i class="fa-solid fa-location-dot mr-1"></i>{% if req.city %}{{ req.city }}{% else %}Não informado{% endif %}</span>
+                                <span><i class="fa-solid fa-user mr-1"></i>{% if req.client.get_full_name %}{{ req.client.get_full_name }}{% else %}{{ req.client.username }}{% endif %}</span>
+                            </div>
+                            {% if req.client.whatsapp %}
+                            <a href="https://wa.me/55{{ req.client.whatsapp }}" target="_blank" class="w-full block text-center bg-whatsapp text-white py-2.5 rounded-lg font-medium hover:bg-green-600 transition-colors text-sm flex items-center justify-center gap-2">
+                                <i class="fa-brands fa-whatsapp"></i> Fale no WhatsApp
+                            </a>
+                            {% else %}
+                            <p class="text-xs text-gray-400 text-center">Sem WhatsApp disponível</p>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -99,7 +143,16 @@
                         </div>
 
                         <div class="pt-12 px-6 pb-6 flex-grow flex flex-col">
-                            <h3 class="text-xl font-bold text-gray-900 mb-0.5">{{ pro.user.get_full_name }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-0.5">
+                                {% if pro.user.get_full_name %}{{ pro.user.get_full_name }}{% else %}{{ pro.user.username }}{% endif %}
+                            </h3>
+                            {% if pro.services.all %}
+                            <div class="flex flex-wrap gap-1 mb-2">
+                                {% for svc in pro.services.all|slice:":3" %}
+                                <span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{{ svc.title }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
 
                             {% with rating=pro.rating|default:0|floatformat:"0" %}
                             <div class="flex items-center gap-1 mb-3 text-yellow-400 text-sm">

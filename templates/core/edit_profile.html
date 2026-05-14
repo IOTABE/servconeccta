@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Perfil - ServiConecta{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-user-pen text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Editar Perfil</h2>
+                <p class="text-gray-500 mt-2">Atualize suas informações pessoais</p>
+
+                <!-- Avatar Upload -->
+                <div class="mt-6 flex justify-center">
+                    <div class="relative">
+                        <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Foto de perfil" class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                    <i class="fa-solid fa-user text-3xl"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <label for="avatarInput" class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-primary/90">
+                            <i class="fa-solid fa-camera text-sm"></i>
+                        </label>
+                    </div>
+                </div>
+                <input type="file" id="avatarInput" name="avatar" accept="image/*" class="hidden">
+            </div>
+
+            {% if success %}
+            <div class="bg-green-50 text-green-600 p-4 rounded-xl mb-6 text-center">
+                <i class="fa-solid fa-check-circle mr-2"></i> Perfil atualizado com sucesso!
+            </div>
+            {% endif %}
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                        <input type="text" name="first_name" value="{{ user.first_name|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sobrenome</label>
+                        <input type="text" name="last_name" value="{{ user.last_name|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                    <input type="tel" name="phone" value="{{ user.phone|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="(11) 99999-9999">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
+                    <input type="tel" name="whatsapp" value="{{ user.whatsapp|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="11999999999">
+                </div>
+
+                {% if profile %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sua descrição (Bio)</label>
+                    <textarea name="bio" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none" placeholder="Conte aos clientes sobre você e seus serviços...">{{ profile.bio|default:'' }}</textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Cidade</label>
+                        <input type="text" name="city" value="{{ profile.city|default:'' }}" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="São Paulo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select name="state" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                            <option value="">Selecione</option>
+                            <option value="AC" {% if profile.state == 'AC' %}selected{% endif %}>AC</option>
+                            <option value="AL" {% if profile.state == 'AL' %}selected{% endif %}>AL</option>
+                            <option value="AP" {% if profile.state == 'AP' %}selected{% endif %}>AP</option>
+                            <option value="AM" {% if profile.state == 'AM' %}selected{% endif %}>AM</option>
+                            <option value="BA" {% if profile.state == 'BA' %}selected{% endif %}>BA</option>
+                            <option value="CE" {% if profile.state == 'CE' %}selected{% endif %}>CE</option>
+                            <option value="DF" {% if profile.state == 'DF' %}selected{% endif %}>DF</option>
+                            <option value="ES" {% if profile.state == 'ES' %}selected{% endif %}>ES</option>
+                            <option value="GO" {% if profile.state == 'GO' %}selected{% endif %}>GO</option>
+                            <option value="MA" {% if profile.state == 'MA' %}selected{% endif %}>MA</option>
+                            <option value="MT" {% if profile.state == 'MT' %}selected{% endif %}>MT</option>
+                            <option value="MS" {% if profile.state == 'MS' %}selected{% endif %}>MS</option>
+                            <option value="MG" {% if profile.state == 'MG' %}selected{% endif %}>MG</option>
+                            <option value="PA" {% if profile.state == 'PA' %}selected{% endif %}>PA</option>
+                            <option value="PB" {% if profile.state == 'PB' %}selected{% endif %}>PB</option>
+                            <option value="PR" {% if profile.state == 'PR' %}selected{% endif %}>PR</option>
+                            <option value="PE" {% if profile.state == 'PE' %}selected{% endif %}>PE</option>
+                            <option value="PI" {% if profile.state == 'PI' %}selected{% endif %}>PI</option>
+                            <option value="RJ" {% if profile.state == 'RJ' %}selected{% endif %}>RJ</option>
+                            <option value="RN" {% if profile.state == 'RN' %}selected{% endif %}>RN</option>
+                            <option value="RS" {% if profile.state == 'RS' %}selected{% endif %}>RS</option>
+                            <option value="RO" {% if profile.state == 'RO' %}selected{% endif %}>RO</option>
+                            <option value="RR" {% if profile.state == 'RR' %}selected{% endif %}>RR</option>
+                            <option value="SC" {% if profile.state == 'SC' %}selected{% endif %}>SC</option>
+                            <option value="SP" {% if profile.state == 'SP' %}selected{% endif %}>SP</option>
+                            <option value="SE" {% if profile.state == 'SE' %}selected{% endif %}>SE</option>
+                            <option value="TO" {% if profile.state == 'TO' %}selected{% endif %}>TO</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors">
+                        <i class="fa-solid fa-check mr-2"></i> Salvar
+                    </button>
+                    <a href="{% url 'core:index' %}" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

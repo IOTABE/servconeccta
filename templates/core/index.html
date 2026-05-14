@@ -112,7 +112,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" id="categoryGrid">
             {% if categories %}
                 {% for category in categories %}
-                    <a href="/buscar/?q={{ category.name|urlencode }}"
+                    <a href="{% url 'core:search' %}?category={{ category.slug }}"
                        class="category-card group bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100 flex flex-col items-center text-center transform hover:-translate-y-1.5">
                         <div class="w-16 h-16 rounded-full bg-blue-50 text-primary flex items-center justify-center text-2xl mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300">
                             {% if category.icon %}
@@ -231,9 +231,18 @@
                         </div>
 
                         <div class="pt-12 px-6 pb-6 flex-grow flex flex-col">
-                            <h3 class="text-xl font-bold text-gray-900 mb-0.5">{{ pro.user.get_full_name }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-0.5">
+                                {% if pro.user.get_full_name %}{{ pro.user.get_full_name }}{% else %}{{ pro.user.username }}{% endif %}
+                            </h3>
                             {% if pro.user.user_type == 'professional' %}
-                                <p class="text-primary font-medium text-sm mb-3">Profissional</p>
+                                <p class="text-primary font-medium text-sm mb-2">Profissional</p>
+                            {% endif %}
+                            {% if pro.services.all %}
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                {% for svc in pro.services.all|slice:":3" %}
+                                <span class="text-xs bg-secondary/10 text-secondary px-2 py-0.5 rounded-full">{{ svc.title }}</span>
+                                {% endfor %}
+                            </div>
                             {% endif %}
 
                             <div class="flex items-center gap-1 mb-3 text-yellow-400 text-sm">
