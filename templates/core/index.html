@@ -26,20 +26,21 @@
             </p>
 
             <!-- Search Bar -->
-            <div class="bg-white p-1.5 rounded-full shadow-2xl flex items-center max-w-lg mx-auto md:mx-0 cursor-pointer hover:shadow-primary/20 transition-shadow"
-                 id="searchTrigger"
-                 role="button"
-                 tabindex="0">
-                <div class="pl-5 text-gray-400">
-                    <i class="fa-solid fa-search"></i>
+            <form action="{% url 'core:search' %}" method="get" class="max-w-lg mx-auto md:mx-0">
+                <div class="bg-white p-1.5 rounded-full shadow-2xl flex items-center cursor-pointer hover:shadow-primary/20 transition-shadow">
+                    <div class="pl-5 text-gray-400">
+                        <i class="fa-solid fa-search"></i>
+                    </div>
+                    <input type="text"
+                           name="q"
+                           placeholder="O que você precisa? (ex: Encanador)"
+                           class="w-full py-3.5 px-4 text-gray-700 bg-transparent outline-none placeholder-gray-400"
+                           id="homeSearchInput">
+                    <button type="submit" class="bg-secondary text-white p-3.5 rounded-full hover:bg-secondary/90 transition-colors w-12 h-12 flex items-center justify-center shadow-lg shadow-secondary/30 flex-shrink-0 mr-1">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
                 </div>
-                <div class="w-full py-3.5 px-4 text-gray-400 text-left bg-transparent outline-none" id="searchPlaceholder">
-                    O que você precisa? (ex: Encanador)
-                </div>
-                <div class="bg-secondary text-white p-3.5 rounded-full hover:bg-secondary/90 transition-colors w-12 h-12 flex items-center justify-center shadow-lg shadow-secondary/30 flex-shrink-0 mr-1">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-            </div>
+            </form>
 
             <div class="mt-5 flex items-center justify-center md:justify-start text-sm text-blue-200 gap-4 flex-wrap">
                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-check-circle text-secondary"></i> Profissionais verificados</span>
@@ -471,17 +472,7 @@
 
 {% block extra_scripts %}
 <script>
-    // Inline search filter for category grid
     document.addEventListener('DOMContentLoaded', function() {
-        const searchTrigger = document.getElementById('searchTrigger');
-        if (searchTrigger) {
-            searchTrigger.addEventListener('click', function() {
-                // The search overlay in base.html handles this via the #searchTrigger id
-                const event = new Event('click');
-                document.querySelector('#searchTrigger')?.dispatchEvent(event);
-            });
-        }
-
         // Animate stats on scroll
         const statsSection = document.querySelector('.bg-primary .grid');
         if (statsSection) {

@@ -146,5 +146,15 @@ document.addEventListener('DOMContentLoaded', function() {
     overlayInput.addEventListener('input', function() {
         performSearch(this.value);
     });
+
+    overlayInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const term = encodeURIComponent(this.value.trim());
+            if (term) {
+                window.location.href = '/buscar/?q=' + term;
+            }
+        }
+    });
 });
 </script>
