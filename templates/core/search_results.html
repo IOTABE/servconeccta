@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Busca: {{ query|default:'Todos os serviços' }} - ServiConecta{% endblock %}
+
+{% block content %}
+
+<!-- Search Header -->
+<section class="bg-white border-b border-gray-100">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-2xl">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                {% if query %}
+                    Resultados para "<span class="text-primary">{{ query }}</span>"
+                {% else %}
+                    Explorar Serviços
+                {% endif %}
+            </h1>
+            <p class="text-gray-500">{{ total_results }} resultado{{ total_results|pluralize:'s' }} encontrado{{ total_results|pluralize:'s' }}</p>
+
+            <!-- Search Form -->
+            <form action="{% url 'core:search' %}" method="GET" class="mt-6">
+                <div class="flex gap-2">
+                    <div class="flex-1 relative">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text"
+                               name="q"
+                               value="{{ query }}"
+                               placeholder="Buscar profissionais ou serviços..."
+                               class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-gray-700 bg-gray-50">
+                    </div>
+                    <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                        Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Results -->
+<section class="py-10 bg-gray-50 flex-grow">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        {% if categories or professionals %}
+            <!-- Categories Found -->
+            {% if categories %}
+            <div class="mb-10">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-th-large text-primary"></i>
+                    Categorias
+                    <span class="text-sm font-normal text-gray-400">({{ categories|length }})</span>
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {% for cat in categories %}
+                    <a href="{% url 'core:search' %}?q={{ cat.name|urlencode }}"
+                       class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-md transition-all hover:-translate-y-0.5">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-primary flex items-center justify-center text-lg mb-2 group-hover:bg-primary group-hover:text-white transition-all">
+                            {% if cat.icon %}
+                                <i class="fa-solid fa-{{ cat.icon }}"></i>
+                            {% else %}
+                                <i class="fa-solid fa-wrench"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="font-medium text-gray-800 text-sm">{{ cat.name }}</h3>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Professionals Found -->
+            {% if professionals %}
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-primary"></i>
+                    Profissionais
+                    <span class="text-sm font-normal text-gray-400">({{ professionals|length }})</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for pro in professionals %}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full group">
+                        <div class="h-24 bg-gradient-to-r from-blue-100 to-blue-50 relative">
+                            <div class="absolute -bottom-10 left-6 z-10">
+                                <div class="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-md">
+                                    {% if pro.user.avatar %}
+                                        <img src="{{ pro.user.avatar.url }}" alt="{{ pro.user.get_full_name }}" class="w-full h-full object-cover">
+                                    {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ pro.user.get_full_name|urlencode }}&background=0066cc&color=fff&size=150" alt="{{ pro.user.get_full_name }}" class="w-full h-full object-cover">
+                                    {% endif %}
+                                </div>
+                                <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-check text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-location-dot text-primary"></i>
+                                {% if pro.city %}{{ pro.city }}{% else %}Próximo{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="pt-12 px-6 pb-6 flex-grow flex flex-col">
+                            <h3 class="text-xl font-bold text-gray-900 mb-0.5">{{ pro.user.get_full_name }}</h3>
+
+                            {% with rating=pro.rating|default:0|floatformat:"0" %}
+                            <div class="flex items-center gap-1 mb-3 text-yellow-400 text-sm">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= rating|add:0 %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% elif forloop.counter == rating|add:1 %}
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-gray-500 text-xs ml-1">({{ pro.total_reviews|default:0 }} avaliações)</span>
+                            </div>
+                            {% endwith %}
+
+                            <p class="text-gray-600 text-sm mb-6 line-clamp-2">{{ pro.bio|default:'Profissional qualificado.' }}</p>
+
+                            <div class="mt-auto">
+                                <a href="https://wa.me/55{{ pro.user.whatsapp|default:'5511999999999' }}"
+                                   target="_blank"
+                                   class="w-full block text-center bg-whatsapp text-white py-3 rounded-xl font-medium hover:bg-green-600 transition-colors shadow-sm flex items-center justify-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-xl"></i> Contato via WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <!-- No Results -->
+            <div class="text-center py-20">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-search text-gray-400 text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Nenhum resultado encontrado</h2>
+                <p class="text-gray-500 mb-8 max-w-md mx-auto">
+                    Não encontramos nada para "{{ query }}". Tente buscar por outro termo ou navegue pelas categorias abaixo.
+                </p>
+                <a href="{% url 'core:index' %}" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao início
+                </a>
+
+                <!-- Fallback categories -->
+                <div class="mt-12">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Categorias populares</h3>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="{% url 'core:search' %}?q=Limpeza" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">🧹 Limpeza</a>
+                        <a href="{% url 'core:search' %}?q=Eletricista" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">⚡ Eletricista</a>
+                        <a href="{% url 'core:search' %}?q=Pedreiro" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">🔨 Pedreiro</a>
+                        <a href="{% url 'core:search' %}?q=Advogado" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">⚖️ Advogado</a>
+                        <a href="{% url 'core:search' %}?q=Aulas" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">📚 Aulas</a>
+                        <a href="{% url 'core:search' %}?q=Jardinagem" class="px-4 py-2 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:bg-primary hover:text-white hover:border-primary transition-all">🌿 Jardinagem</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

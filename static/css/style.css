@@ -1,0 +1,199 @@
+/* ServiConecta Custom Styles */
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Category card hover effects */
+.category-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 50%, rgba(0,102,204,0.03));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.category-card:hover::after {
+    opacity: 1;
+}
+
+/* Professional card image zoom */
+.professional-card .rounded-full img {
+    transition: transform 0.4s ease;
+}
+
+.professional-card:hover .rounded-full img {
+    transform: scale(1.1);
+}
+
+/* WhatsApp button pulse */
+@keyframes whatsapp-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.bg-whatsapp {
+    animation: whatsapp-pulse 2s infinite;
+}
+
+.professional-card .bg-whatsapp:hover {
+    animation: none;
+}
+
+/* Search overlay backdrop */
+#searchOverlay {
+    transition: opacity 0.3s ease;
+}
+
+/* Mobile menu smooth toggle */
+#mobileMenu {
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Chip hover in search */
+.suggestion-chip {
+    user-select: none;
+}
+
+/* Star rating hover */
+.text-yellow-400 .fa-star,
+.text-yellow-400 .fa-star-half-stroke {
+    filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.3));
+}
+
+/* Nav links underline effect */
+nav a {
+    position: relative;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 1px;
+}
+
+nav a:hover::after {
+    width: 60%;
+}
+
+/* Button press effect */
+button:active,
+a:active {
+    transform: scale(0.97);
+}
+
+/* Gradient text for headings */
+.text-gradient {
+    background: linear-gradient(135deg, #0066cc, #ff6600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Footer link hover */
+footer a {
+    position: relative;
+    display: inline-block;
+}
+
+footer a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s ease;
+}
+
+footer a:hover::after {
+    width: 100%;
+}
+
+/* Stats counter animation */
+.bg-primary .grid > div {
+    position: relative;
+}
+
+.bg-primary .grid > div::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 1px;
+}
+
+/* Card entrance animation */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.professional-card {
+    animation: cardEntrance 0.5s ease-out forwards;
+}
+
+.professional-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.professional-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}

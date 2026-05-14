@@ -1,0 +1,21 @@
+{% load static %}
+
+<div class="category-card group bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100 flex flex-col items-center text-center transform hover:-translate-y-1.5 cursor-pointer"
+     data-category="{{ category.name|default:name|lower }}"
+     data-slug="{{ category.slug|default:slug|default:'' }}">
+    <div class="w-16 h-16 rounded-full {{ bg_color|default:'bg-blue-50' }} {{ text_color|default:'text-primary' }} flex items-center justify-center text-2xl mb-4 group-hover:{{ hover_bg|default:'bg-primary' }} group-hover:text-white transition-all duration-300">
+        {% if category.icon %}
+            <i class="fa-solid fa-{{ category.icon }}"></i>
+        {% elif icon %}
+            <i class="fa-solid fa-{{ icon }}"></i>
+        {% else %}
+            <i class="fa-solid fa-wrench"></i>
+        {% endif %}
+    </div>
+    <h3 class="font-semibold text-gray-800">{{ category.name|default:name }}</h3>
+    {% if category.description %}
+        <p class="text-xs text-gray-500 mt-1 line-clamp-1">{{ category.description }}</p>
+    {% elif description %}
+        <p class="text-xs text-gray-500 mt-1 line-clamp-1">{{ description }}</p>
+    {% endif %}
+</div>

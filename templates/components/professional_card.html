@@ -1,0 +1,60 @@
+{% load static %}
+
+<div class="professional-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full group">
+    <div class="h-24 bg-gradient-to-r {{ cover_gradient|default:'from-blue-100 to-blue-50' }} relative">
+        <div class="absolute -bottom-10 left-6 z-10">
+            <div class="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-md">
+                {% if professional.user.avatar %}
+                    <img src="{{ professional.user.avatar.url }}" alt="{{ professional.user.get_full_name }}" class="w-full h-full object-cover">
+                {% elif avatar_url %}
+                    <img src="{{ avatar_url }}" alt="{{ name }}" class="w-full h-full object-cover">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ professional.user.get_full_name|urlencode|default:name|urlencode }}&background=0066cc&color=fff&size=150" alt="{{ professional.user.get_full_name|default:name }}" class="w-full h-full object-cover">
+                {% endif %}
+            </div>
+            <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm" title="Verificado">
+                <i class="fa-solid fa-check text-white text-xs"></i>
+            </div>
+        </div>
+        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-location-dot {{ distance_color|default:'text-primary' }}"></i>
+            {% if professional.distance_km %}
+                {{ professional.distance_km|floatformat:1 }} km
+            {% elif distance %}
+                {{ distance }} km
+            {% else %}
+                2.0 km
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="pt-12 px-6 pb-6 flex-grow flex flex-col">
+        <h3 class="text-xl font-bold text-gray-900 mb-0.5">{{ professional.user.get_full_name|default:name }}</h3>
+        <p class="{{ title_color|default:'text-primary' }} font-medium text-sm mb-3">{{ professional.title|default:profession }}</p>
+
+        <div class="flex items-center gap-1 mb-3 text-yellow-400 text-sm">
+            {% with rating=professional.rating|default:rating|default:5 %}
+                {% for i in "12345" %}
+                    {% if forloop.counter <= rating %}
+                        <i class="fa-solid fa-star"></i>
+                    {% elif forloop.counter == rating|add:"0.5"|floatformat:0 %}
+                        <i class="fa-solid fa-star-half-stroke"></i>
+                    {% else %}
+                        <i class="fa-regular fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+            <span class="text-gray-500 text-xs ml-1">({{ professional.total_reviews|default:reviews|default:0 }} avaliações)</span>
+        </div>
+
+        <p class="text-gray-600 text-sm mb-6 line-clamp-2">{{ professional.bio|default:bio|default:'Profissional qualificado pronto para atender você.' }}</p>
+
+        <div class="mt-auto space-y-2">
+            <a href="https://wa.me/55{{ professional.user.whatsapp|default:whatsapp|default:'5511999999999' }}"
+               target="_blank"
+               class="w-full block text-center bg-whatsapp text-white py-3 rounded-xl font-medium hover:bg-green-600 transition-colors shadow-sm flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-xl"></i> Contato via WhatsApp
+            </a>
+        </div>
+    </div>
+</div>

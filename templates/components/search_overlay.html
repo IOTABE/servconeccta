@@ -1,0 +1,150 @@
+{% load static %}
+
+<!-- Search Overlay -->
+<div id="searchOverlay" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="min-h-screen flex flex-col justify-start pt-20 px-4">
+        <div class="w-full max-w-2xl mx-auto">
+            <!-- Search Box -->
+            <div class="bg-white rounded-2xl shadow-2xl p-4 flex items-center gap-3 transform -translate-y-4 transition-transform duration-300" id="searchBox">
+                <i class="fa-solid fa-search text-gray-400 text-xl"></i>
+                <input type="text"
+                       id="searchOverlayInput"
+                       placeholder="O que você precisa? (ex: Encanador, Limpeza...)"
+                       class="w-full py-2 outline-none text-gray-700 bg-transparent text-lg"
+                       autofocus>
+                <button id="closeSearch" class="text-gray-400 hover:text-gray-600 transition-colors p-2">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Suggestions -->
+            <div class="mt-4" id="searchSuggestions">
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <p class="text-sm text-gray-500 mb-4 font-medium">Sugestões:</p>
+                    <div class="flex flex-wrap gap-2" id="suggestionChips">
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Encanador">🔧 Encanador</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Eletricista">⚡ Eletricista</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Limpeza">🧹 Limpeza</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Pedreiro">🔨 Pedreiro</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Advogado">⚖️ Advogado</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Aulas">📚 Aulas</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Jardinagem">🌿 Jardinagem</span>
+                        <span class="suggestion-chip px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-primary hover:text-white cursor-pointer transition-all" data-term="Pintor">🎨 Pintor</span>
+                    </div>
+
+                    <!-- Live results -->
+                    <div id="liveResults" class="mt-4 hidden">
+                        <hr class="mb-4 border-gray-100">
+                        <div id="resultsList" class="space-y-3"></div>
+                    </div>
+
+                    <div id="noResults" class="mt-4 hidden text-center py-6 text-gray-500">
+                        <i class="fa-solid fa-search text-4xl mb-3 text-gray-300"></i>
+                        <p>Nenhum resultado encontrado para "<span id="searchTermDisplay"></span>"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('searchOverlay');
+    const overlayInput = document.getElementById('searchOverlayInput');
+    const searchTrigger = document.getElementById('searchTrigger');
+    const closeBtn = document.getElementById('closeSearch');
+    const liveResults = document.getElementById('liveResults');
+    const resultsList = document.getElementById('resultsList');
+    const noResults = document.getElementById('noResults');
+    const searchTermDisplay = document.getElementById('searchTermDisplay');
+    const searchBox = document.getElementById('searchBox');
+
+    const categories = [
+        { name: 'Limpeza', icon: 'broom', slug: 'limpeza', color: 'bg-blue-50', text: 'text-primary' },
+        { name: 'Consertos', icon: 'wrench', slug: 'consertos', color: 'bg-orange-50', text: 'text-secondary' },
+        { name: 'Aulas', icon: 'book-open', slug: 'aulas', color: 'bg-green-50', text: 'text-green-500' },
+        { name: 'Jardinagem', icon: 'leaf', slug: 'jardinagem', color: 'bg-purple-50', text: 'text-purple-500' },
+        { name: 'Eletricista', icon: 'bolt', slug: 'eletricista', color: 'bg-yellow-50', text: 'text-yellow-500' },
+        { name: 'Pedreiro', icon: 'hammer', slug: 'pedreiro', color: 'bg-red-50', text: 'text-red-500' },
+        { name: 'Advogados', icon: 'scale-balanced', slug: 'advogados', color: 'bg-teal-50', text: 'text-teal-500' },
+        { name: 'Pintor', icon: 'paint-roller', slug: 'pintor', color: 'bg-pink-50', text: 'text-pink-500' },
+    ];
+
+    function openSearch() {
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+        searchBox.classList.remove('-translate-y-4');
+        setTimeout(() => overlayInput.focus(), 200);
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSearch() {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+        searchBox.classList.add('-translate-y-4');
+        document.body.style.overflow = '';
+        overlayInput.value = '';
+        liveResults.classList.add('hidden');
+        noResults.classList.add('hidden');
+    }
+
+    if (searchTrigger) {
+        searchTrigger.addEventListener('click', openSearch);
+    }
+
+    closeBtn.addEventListener('click', closeSearch);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeSearch();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSearch();
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+    });
+
+    // Chip clicks
+    document.querySelectorAll('.suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            overlayInput.value = this.dataset.term;
+            performSearch(this.dataset.term);
+        });
+    });
+
+    function performSearch(term) {
+        const t = term.toLowerCase().trim();
+        if (!t) { liveResults.classList.add('hidden'); noResults.classList.add('hidden'); return; }
+
+        const matches = categories.filter(c =>
+            c.name.toLowerCase().includes(t) ||
+            c.slug.includes(t)
+        );
+
+        if (matches.length > 0) {
+            liveResults.classList.remove('hidden');
+            noResults.classList.add('hidden');
+            resultsList.innerHTML = matches.map(cat => `
+                <a href="/buscar/?q=${encodeURIComponent(cat.name)}"
+                   class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                    <div class="w-12 h-12 rounded-full ${cat.color} ${cat.text} flex items-center justify-center text-lg group-hover:bg-primary group-hover:text-white transition-all">
+                        <i class="fa-solid fa-${cat.icon}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-800">${cat.name}</p>
+                        <p class="text-xs text-gray-500">Encontre profissionais de ${cat.name.toLowerCase()}</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition-colors"></i>
+                </a>
+            `).join('');
+        } else {
+            liveResults.classList.add('hidden');
+            noResults.classList.remove('hidden');
+            searchTermDisplay.textContent = term;
+        }
+    }
+
+    overlayInput.addEventListener('input', function() {
+        performSearch(this.value);
+    });
+});
+</script>
