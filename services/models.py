@@ -233,6 +233,8 @@ class ServiceReview(models.Model):
     )
     title = models.CharField(max_length=100, blank=True)
     comment = models.TextField(blank=True)
+    response = models.TextField(blank=True, help_text="Resposta do profissional à avaliação")
+    response_at = models.DateTimeField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

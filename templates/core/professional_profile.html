@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ professional.user.get_full_name }} - ServiConecta{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Profile Header -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-28 h-28 rounded-full overflow-hidden bg-gray-200">
+                            {% if professional.user.avatar %}
+                                <img src="{{ professional.user.avatar.url }}" alt="{{ professional.user.get_full_name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <img src="https://ui-avatars.com/api/?name={{ professional.user.get_full_name|urlencode }}&background=0066cc&color=fff&size=150" alt="{{ professional.user.get_full_name }}" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h1 class="text-2xl font-bold text-gray-900">{{ professional.user.get_full_name }}</h1>
+                            {% if professional.user.is_verified %}
+                            <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+                                <i class="fa-solid fa-check mr-1"></i>Verificado
+                            </span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-600 mb-3">{{ professional.bio|default:"Profissional cadastrado na ServiConecta" }}</p>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                            {% if professional.city %}
+                            <span><i class="fa-solid fa-location-dot text-primary mr-1"></i> {{ professional.city }}{% if professional.state %}-{{ professional.state }}{% endif %}</span>
+                            {% endif %}
+                            <span><i class="fa-solid fa-star text-yellow-400 mr-1"></i> {{ professional.rating|floatformat:"1" }} ({{ professional.total_reviews }} avaliações)</span>
+                            <span><i class="fa-solid fa-briefcase text-gray-400 mr-1"></i> {{ professional.total_jobs }} serviços</span>
+                        </div>
+                        {% if professional.user.whatsapp %}
+                        <a href="https://wa.me/55{{ professional.user.whatsapp }}" target="_blank" class="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg font-medium mt-4 hover:bg-green-600 transition-colors">
+                            <i class="fa-brands fa-whatsapp"></i> Contato via WhatsApp
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services -->
+            {% if services %}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">Serviços Oferecidos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for service in services %}
+                    <div class="border border-gray-100 rounded-xl p-4 hover:border-primary/50 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">{{ service.title }}</h3>
+                                {% if service.category %}
+                                <span class="text-xs text-gray-500">{{ service.category.name }}</span>
+                                {% endif %}
+                            </div>
+                            {% if service.price %}
+                            <span class="text-primary font-semibold">
+                                {% if service.price_type == 'negotiable' %}
+                                    A combinar
+                                {% elif service.price_type == 'hourly' %}
+                                    R$ {{ service.price }}/h
+                                {% else %}
+                                    R$ {{ service.price }}
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if service.description %}
+                        <p class="text-gray-600 text-sm mt-2 line-clamp-2">{{ service.description }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reviews -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-gray-900">Avaliações</h2>
+                    {% if professional.total_reviews > 0 %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-bold text-gray-900">{{ professional.rating|floatformat:"1" }}</span>
+                        <div class="text-yellow-400">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= professional.rating|add:"0" %}
+                                    <i class="fa-solid fa-star"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star text-gray-300"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="text-gray-500 text-sm">({{ professional.total_reviews }} avaliações)</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Rating Stats -->
+                {% if professional.total_reviews > 0 %}
+                <div class="flex items-center justify-center gap-4 mb-8 p-4 bg-gray-50 rounded-xl">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-gray-900">{{ stats.five_stars }}</div>
+                        <div class="text-xs text-gray-500">5 estrelas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-gray-900">{{ stats.four_stars }}</div>
+                        <div class="text-xs text-gray-500">4 estrelas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-gray-900">{{ stats.three_stars }}</div>
+                        <div class="text-xs text-gray-500">3 estrelas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-gray-900">{{ stats.two_stars }}</div>
+                        <div class="text-xs text-gray-500">2 estrelas</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-gray-900">{{ stats.one_star }}</div>
+                        <div class="text-xs text-gray-500">1 estrela</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Reviews List -->
+                {% if reviews %}
+                <div class="space-y-6">
+                    {% for review in reviews %}
+                    <div class="border-b border-gray-100 pb-6 last:border-0">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    {% if review.reviewer.avatar %}
+                                        <img src="{{ review.reviewer.avatar.url }}" class="w-full h-full rounded-full object-cover">
+                                    {% else %}
+                                        <span class="text-gray-500 font-medium">{{ review.reviewer.first_name|default:"U"|slice:":1" }}</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ review.reviewer.get_full_name|default:"Cliente" }}</p>
+                                    <p class="text-xs text-gray-500">{{ review.created_at|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="flex text-yellow-400 text-sm">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star text-gray-300"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if review.title %}
+                        <p class="font-medium text-gray-800 mb-1">{{ review.title }}</p>
+                        {% endif %}
+                        {% if review.comment %}
+                        <p class="text-gray-600 text-sm">{{ review.comment }}</p>
+                        {% endif %}
+                        {% if review.response %}
+                        <div class="mt-3 bg-gray-50 rounded-lg p-3 ml-4 border-l-4 border-primary">
+                            <p class="text-xs text-gray-500 mb-1">
+                                <i class="fa-solid fa-reply mr-1"></i> Resposta do profissional
+                                {% if review.response_at %}- {{ review.response_at|date:"d/m/Y" }}{% endif %}
+                            </p>
+                            <p class="text-gray-700 text-sm">{{ review.response }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa-regular fa-star text-4xl mb-3 text-gray-300"></i>
+                    <p>Ainda sem avaliações</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

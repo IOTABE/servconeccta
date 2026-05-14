@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Trabalhos - ServiConecta{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Meus Trabalhos</h1>
+                    <p class="text-gray-500">Gerencie seus serviços</p>
+                </div>
+            </div>
+
+            <!-- Accepted Jobs -->
+            <div class="mb-8">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fa-solid fa-briefcase text-primary mr-2"></i>Serviços Aceitos
+                </h2>
+                {% if accepted_jobs %}
+                <div class="space-y-4">
+                    {% for job in accepted_jobs %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-semibold text-gray-900">{{ job.title }}</h3>
+                                    {% if job.status == 'accepted' %}
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Aceito</span>
+                                    {% elif job.status == 'in_progress' %}
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">Em Andamento</span>
+                                    {% elif job.status == 'completed' %}
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Concluído</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ job.description }}</p>
+                                <div class="flex items-center gap-4 text-xs text-gray-500">
+                                    <span><i class="fa-solid fa-user mr-1"></i> {{ job.client.get_full_name }}</span>
+                                    <span><i class="fa-solid fa-tag mr-1"></i> {{ job.category.name }}</span>
+                                    {% if job.city %}<span><i class="fa-solid fa-location-dot mr-1"></i> {{ job.city }}</span>{% endif %}
+                                </div>
+                            </div>
+                            {% if job.status != 'completed' %}
+                            <a href="https://wa.me/55{{ job.client.whatsapp }}" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors text-center">
+                                <i class="fa-brands fa-whatsapp mr-1"></i> Contatar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-500">
+                    <i class="fa-solid fa-inbox text-3xl mb-3 text-gray-300"></i>
+                    <p>Nenhum serviço aceito ainda</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Available Jobs -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fa-solid fa-magnifying-glass text-secondary mr-2"></i>Serviços Disponíveis
+                </h2>
+                {% if available_jobs %}
+                <div class="space-y-4">
+                    {% for job in available_jobs %}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-semibold text-gray-900">{{ job.title }}</h3>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Pendente</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ job.description }}</p>
+                                <div class="flex items-center gap-4 text-xs text-gray-500">
+                                    <span><i class="fa-solid fa-tag mr-1"></i> {{ job.category.name }}</span>
+                                    {% if job.city %}<span><i class="fa-solid fa-location-dot mr-1"></i> {{ job.city }}</span>{% endif %}
+                                    <span><i class="fa-solid fa-clock mr-1"></i> {{ job.created_at|date:"d/m/Y" }}</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'core:accept_job' job.id %}" class="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-secondary/90 transition-colors text-center">
+                                <i class="fa-solid fa-check mr-1"></i> Aceitar
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-white rounded-xl border border-gray-100 p-8 text-center text-gray-500">
+                    <i class="fa-solid fa-inbox text-3xl mb-3 text-gray-300"></i>
+                    <p>Nenhum serviço disponível no momento</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

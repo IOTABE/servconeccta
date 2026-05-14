@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="bg-white rounded-2xl shadow-sm border p-8 text-center">
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-user text-2xl text-yellow-600"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Você ainda não é um profissional</h2>
+            <p class="text-gray-600 mb-6">Para aceitar serviços, você precisa ter um perfil profissional ativo.</p>
+            <a href="{% url 'core:edit_profile' %}" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors inline-block">
+                Criar Perfil Profissional
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

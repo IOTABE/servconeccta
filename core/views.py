@@ -374,3 +374,122 @@ def my_services_view(request):
         'services': services,
     }
     return render(request, 'core/my_services.html', context)
+
+
+def professional_profile_view(request, professional_id):
+    from django.http import Http404
+    from users.models import ProfessionalProfile
+    from services.models import ServiceReview, ProfessionalService
+
+    try:
+        professional = ProfessionalProfile.objects.select_related('user').get(pk=professional_id, status='active')
+    except ProfessionalProfile.DoesNotExist:
+        raise Http404('Profissional não encontrado')
+
+    services = ProfessionalService.objects.filter(
+        professional=professional,
+        is_active=True
+    ).select_related('category')
+
+    reviews_query = ServiceReview.objects.filter(professional=professional)
+
+    stats = {
+        'five_stars': reviews_query.filter(rating=5).count(),
+        'four_stars': reviews_query.filter(rating=4).count(),
+        'three_stars': reviews_query.filter(rating=3).count(),
+        'two_stars': reviews_query.filter(rating=2).count(),
+        'one_star': reviews_query.filter(rating=1).count(),
+    }
+
+    reviews = reviews_query.select_related('reviewer', 'service_request').order_by('-created_at')[:20]
+
+    context = {
+        'professional': professional,
+        'services': services,
+        'reviews': reviews,
+        'stats': stats,
+    }
+    return render(request, 'core/professional_profile.html', context)
+
+
+def respond_review_view(request, review_id):
+    from django.http import Http404
+    from django.shortcuts import redirect
+    from services.models import ServiceReview
+
+    if not request.user.is_authenticated:
+        return redirect('core:login')
+
+    try:
+        review = ServiceReview.objects.get(pk=review_id, professional__user=request.user)
+    except ServiceReview.DoesNotExist:
+        raise Http404('Avaliação não encontrada')
+
+    if request.method == 'POST':
+        response = request.POST.get('response', '').strip()
+
+        if response:
+            review.response = response
+            from django.utils import timezone
+            review.response_at = timezone.now()
+            review.save()
+
+return redirect('core:professional_profile', professional_id=review.professional.id)
+
+
+def professional_jobs_view(request):
+    if not request.user.is_authenticated:
+        from django.shortcuts import redirect
+        return redirect('core:login')
+
+    from users.models import ProfessionalProfile
+    from services.models import ServiceRequest
+
+    try:
+        profile = request.user.professional_profile
+    except ProfessionalProfile.DoesNotExist:
+        return render(request, 'core/not_professional.html')
+
+    accepted_jobs = ServiceRequest.objects.filter(
+        professional=profile
+    ).select_related('category', 'client').order_by('-updated_at')
+
+    available_jobs = ServiceRequest.objects.filter(
+        status='pending',
+        is_custom=False
+    ).select_related('category', 'client').order_by('-created_at')[:20]
+
+    context = {
+        'profile': profile,
+        'accepted_jobs': accepted_jobs,
+        'available_jobs': available_jobs,
+    }
+    return render(request, 'core/professional_jobs.html', context)
+
+
+def accept_job_view(request, job_id):
+    from django.http import Http404
+    from django.shortcuts import redirect
+    from services.models import ServiceRequest
+    from users.models import ProfessionalProfile
+
+    if not request.user.is_authenticated:
+        return redirect('core:login')
+
+    try:
+        profile = request.user.professional_profile
+    except ProfessionalProfile.DoesNotExist:
+        raise Http404('Você não é um profissional')
+
+    try:
+        job = ServiceRequest.objects.get(pk=job_id, status='pending')
+    except ServiceRequest.DoesNotExist:
+        raise Http404('Serviço não disponível')
+
+    job.professional = profile
+    job.status = 'accepted'
+    job.save()
+
+    return redirect('core:professional_jobs')
+
+    return redirect('core:professional_profile', professional_id=review.professional.id)
