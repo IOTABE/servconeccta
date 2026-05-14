@@ -260,13 +260,17 @@ def custom_service_view(request):
             has_professional_profile = True
 
             from services.models import ServiceCategory, ProfessionalService
+            category = None
             if category_name:
                 try:
                     category = ServiceCategory.objects.get(name__iexact=category_name)
                 except ServiceCategory.DoesNotExist:
-                    category = None
-            else:
-                category = None
+                    from django.utils.text import slugify
+                    category = ServiceCategory.objects.create(
+                        name=category_name,
+                        slug=slugify(category_name),
+                        description=f"Categoria criada automaticamente para {category_name}"
+                    )
 
             ProfessionalService.objects.create(
                 professional=profile,
@@ -434,7 +438,7 @@ def respond_review_view(request, review_id):
             review.response_at = timezone.now()
             review.save()
 
-return redirect('core:professional_profile', professional_id=review.professional.id)
+    return redirect('core:professional_profile', professional_id=review.professional.id)
 
 
 def professional_jobs_view(request):
