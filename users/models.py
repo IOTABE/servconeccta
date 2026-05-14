@@ -103,3 +103,26 @@ class ProfessionalProfile(models.Model):
 
     def __str__(self):
         return f"Prof: {self.user.get_full_name()}"
+
+    def update_rating(self):
+        """Atualiza a média de avaliações e o total de avaliações"""
+        from django.db.models import Avg, Count
+        from services.models import ServiceReview
+
+        stats = ServiceReview.objects.filter(professional=self).aggregate(
+            avg_rating=Avg('rating'),
+            count=Count('id')
+        )
+
+        self.rating = stats['avg_rating'] or 0
+        self.total_reviews = stats['count'] or 0
+        self.save(update_fields=['rating', 'total_reviews'])
+
+    def update_total_jobs(self):
+        """Atualiza o total de serviços concluídos"""
+        from services.models import ServiceRequest
+        self.total_jobs = ServiceRequest.objects.filter(
+            status='completed',
+            category__professional_services__professional=self
+        ).distinct().count()
+        self.save(update_fields=['total_jobs'])

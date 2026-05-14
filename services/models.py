@@ -55,6 +55,14 @@ class ServiceRequest(models.Model):
         on_delete=models.CASCADE,
         related_name='service_requests'
     )
+    professional = models.ForeignKey(
+        'users.ProfessionalProfile',
+        on_delete=models.SET_NULL,
+        related_name='service_jobs',
+        null=True,
+        blank=True,
+        help_text="Profissional que aceitou/realiza o serviço"
+    )
     category = models.ForeignKey(
         ServiceCategory,
         on_delete=models.PROTECT,
@@ -193,3 +201,48 @@ class ProfessionalService(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.professional.user.get_full_name()}"
+
+
+class ServiceReview(models.Model):
+    """Avaliação de serviço prestado"""
+
+    service_request = models.ForeignKey(
+        'ServiceRequest',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_given'
+    )
+    professional = models.ForeignKey(
+        'users.ProfessionalProfile',
+        on_delete=models.CASCADE,
+        related_name='reviews_received'
+    )
+
+    rating = models.PositiveIntegerField(
+        choices=[
+            (1, '1 - Ruim'),
+            (2, '2 - Regular'),
+            (3, '3 - Bom'),
+            (4, '4 - Muito Bom'),
+            (5, '5 - Excelente'),
+        ]
+    )
+    title = models.CharField(max_length=100, blank=True)
+    comment = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'service_reviews'
+        unique_together = ['service_request', 'reviewer']
+        indexes = [
+            models.Index(fields=['professional', 'created_at']),
+            models.Index(fields=['rating']),
+        ]
+
+    def __str__(self):
+        return f"Avaliação de {self.reviewer} para {self.professional} - {self.rating}★"

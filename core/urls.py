@@ -11,4 +11,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('servico-personalizado/', views.custom_service_view, name='custom_service'),
     path('editar-perfil/', views.edit_profile_view, name='edit_profile'),
+    path('encerrar-servico/<int:service_id>/', views.complete_service_view, name='complete_service'),
+    path('meus-servicos/', views.my_services_view, name='my_services'),
 ]

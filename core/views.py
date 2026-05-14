@@ -295,3 +295,82 @@ def custom_service_view(request):
     return render(request, 'core/custom_service.html', {
         'has_professional_profile': has_professional_profile
     })
+
+
+def complete_service_view(request, service_id):
+    from django.http import Http404
+    from services.models import ServiceRequest, ServiceReview
+
+    if not request.user.is_authenticated:
+        from django.shortcuts import redirect
+        return redirect('core:login')
+
+    try:
+        service = ServiceRequest.objects.get(pk=service_id, client=request.user)
+    except ServiceRequest.DoesNotExist:
+        raise Http404('Serviço não encontrado')
+
+    if service.status not in ['accepted', 'in_progress']:
+        raise Http404('Este serviço não pode ser concluído')
+
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        title = request.POST.get('title', '').strip()
+        comment = request.POST.get('comment', '').strip()
+
+        errors = []
+        if not rating:
+            errors.append('Selecione uma nota para o serviço.')
+        else:
+            rating = int(rating)
+
+        if errors:
+            return render(request, 'core/complete_service.html', {
+                'service': service,
+                'errors': errors
+            })
+
+        if not service.professional:
+            return render(request, 'core/complete_service.html', {
+                'service': service,
+                'errors': ['Profissional não encontrado para este serviço.']
+            })
+
+        ServiceReview.objects.create(
+            service_request=service,
+            reviewer=request.user,
+            professional=service.professional,
+            rating=rating,
+            title=title,
+            comment=comment
+        )
+
+        service.professional.update_rating()
+
+        service.status = 'completed'
+        service.save()
+
+        return render(request, 'core/complete_service.html', {
+            'service': service,
+            'success': True,
+            'rating': rating
+        })
+
+    return render(request, 'core/complete_service.html', {'service': service})
+
+
+def my_services_view(request):
+    from services.models import ServiceRequest
+
+    if not request.user.is_authenticated:
+        from django.shortcuts import redirect
+        return redirect('core:login')
+
+    services = ServiceRequest.objects.filter(
+        client=request.user
+    ).select_related('category').order_by('-created_at')
+
+    context = {
+        'services': services,
+    }
+    return render(request, 'core/my_services.html', context)

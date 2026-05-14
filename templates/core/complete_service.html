@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Encerrar Serviço - ServiConecta{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto">
+            {% if success %}
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fa-solid fa-check text-4xl text-green-500"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Serviço Concluído!</h2>
+                <p class="text-gray-600 mb-6">Obrigado por avaliar o serviço. Sua avaliação ajuda outros clientes.</p>
+
+                <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                    <p class="text-sm text-gray-500 mb-2">Sua avaliação</p>
+                    <div class="flex justify-center gap-1 text-2xl text-yellow-400 mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= rating %}
+                                <i class="fa-solid fa-star"></i>
+                            {% else %}
+                                <i class="fa-regular fa-star text-gray-300"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex gap-4 justify-center">
+                    <a href="{% url 'core:index' %}" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors">
+                        Voltar ao Início
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <a href="{% url 'core:index' %}" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-arrow-left text-xl"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Encerrar Serviço</h1>
+                        <p class="text-gray-500">Avalie o serviço prestado</p>
+                    </div>
+                </div>
+
+                {% if errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
+                    <ul class="list-disc list-inside">
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ service.title }}</h3>
+                    <p class="text-gray-600 text-sm mb-3">{{ service.description|truncatewords:30 }}</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span><i class="fa-solid fa-tag mr-1"></i> {{ service.category.name|default:"Serviço Personalizado" }}</span>
+                        <span><i class="fa-solid fa-location-dot mr-1"></i> {{ service.city|default:"" }}</span>
+                    </div>
+                </div>
+
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Como foi sua experiência?</label>
+                        <div class="flex justify-center gap-2">
+                            {% for i in "54321" %}
+                            <label class="cursor-pointer flex flex-col items-center">
+                                <input type="radio" name="rating" value="{{ i }}" class="peer sr-only">
+                                <div class="w-14 h-14 rounded-xl border-2 border-gray-200 peer-checked:border-secondary peer-checked:bg-secondary/10 flex items-center justify-center text-2xl text-gray-300 peer-checked:text-secondary transition-all hover:border-secondary/50">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <span class="text-xs text-gray-500 mt-1">{{ i }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <p class="text-center text-sm text-gray-500 mt-2">1 = Ruim | 5 = Excelente</p>
+                    </div>
+
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Título da avaliação (opcional)</label>
+                        <input type="text" name="title" id="title" maxlength="100"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                               placeholder="Ex: Excelente trabalho!">
+                    </div>
+
+                    <div>
+                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Comentário (opcional)</label>
+                        <textarea name="comment" id="comment" rows="4"
+                                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"
+                                  placeholder="Conte sua experiência com o serviço prestado..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-secondary text-white py-4 rounded-xl font-medium hover:bg-secondary/90 transition-colors shadow-lg shadow-secondary/30">
+                        <i class="fa-solid fa-check mr-2"></i> Concluir Serviço
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
